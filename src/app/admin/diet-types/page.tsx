@@ -13,9 +13,11 @@ export default async function DietTypesPage() {
       </h1>
 
       <form
-        action={createDietType}
-        className="flex gap-2 mb-8 max-w-lg"
-      >
+  action={async (formData) => {
+    await createDietType(formData);
+  }}
+  className="flex gap-2 mb-8 max-w-lg"
+>
         <input
           name="nameEn"
           placeholder="English name"

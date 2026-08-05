@@ -11,9 +11,11 @@ export default async function CategoriesPage() {
       <h1 className="text-2xl font-semibold mb-6">Categories</h1>
 
       <form
-        action={createCategory}
-        className="flex gap-2 mb-8 max-w-lg"
-      >
+  action={async (formData) => {
+    await createCategory(formData);
+  }}
+  className="flex gap-2 mb-8 max-w-lg"
+>
         <input
           name="nameEn"
           placeholder="English name"
