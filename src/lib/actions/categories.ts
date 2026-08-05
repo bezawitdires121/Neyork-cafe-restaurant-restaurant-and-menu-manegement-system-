@@ -22,4 +22,5 @@ export async function createCategory(formData: FormData) {
 export async function deleteCategory(categoryId: string) {
   await prisma.category.delete({ where: { id: categoryId } });
   revalidatePath("/admin/categories");
+  return { success: true };
 }
