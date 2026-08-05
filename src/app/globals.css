@@ -1,26 +1,27 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+
+@theme {
+
+  --color-nyc-base: #111111;
+--color-nyc-cream: #f8f5ef;
+--color-nyc-gold: #c9a14a;
+  --color-nyc-gold-light: #d4a24c;
+  --color-nyc-wine: #6b1e23;
+  --color-nyc-taupe: #8a7f6e;
+ 
 }
+@custom-variant dark (&:not(.light, .light *));
+@custom-variant light (&:is(.light, .light *));
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-inter), Arial, sans-serif;
+}
+
+.input {
+  @apply px-3 py-2 rounded-md border text-sm transition-colors;
+  @apply bg-nyc-base/60 border-nyc-gold/20 text-nyc-cream;
+  @apply light:bg-white light:border-nyc-taupe/30 light:text-nyc-base;
 }

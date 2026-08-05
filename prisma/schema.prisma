@@ -1,0 +1,250 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Restaurant {
+  id             String   @id @default(cuid())
+  name           String   @default("New York Cafe & Restaurant")
+  logoUrl        String?
+  description    String?
+  address        String?
+  phone          String?
+  email          String?
+  openingHours   Json?
+  wifiPassword   String?
+  socialLinks    Json?
+  exchangeRate   Float    @default(1.0)
+  telebirrNumber String?
+  bankAccounts   Json?
+  heroImageUrl   String?
+  aboutContent   String?
+  storyContent   String?
+  footerContent  Json?
+  updatedAt      DateTime @updatedAt
+  createdAt      DateTime @default(now())
+  latitude       Float?
+  longitude      Float?
+  nameAm         String?
+  floors         Floor[]
+}
+
+model Floor {
+  id             String          @id @default(cuid())
+  name           String
+  order          Int             @default(0)
+  restaurantId   String
+  nameAm         String?
+  restaurant     Restaurant      @relation(fields: [restaurantId], references: [id])
+  orders         Order[]
+  tables         Table[]
+  waiterRequests WaiterRequest[]
+
+  @@unique([restaurantId, name])
+}
+
+model Table {
+  id             String          @id @default(cuid())
+  number         String
+  capacity       Int             @default(4)
+  isEnabled      Boolean         @default(true)
+  floorId        String
+  orders         Order[]
+  floor          Floor           @relation(fields: [floorId], references: [id])
+  waiterRequests WaiterRequest[]
+
+  @@unique([floorId, number])
+}
+
+model Category {
+  id            String     @id @default(cuid())
+  nameEn        String
+  nameAm        String
+  order         Int        @default(0)
+  menuItems     MenuItem[]
+  additionalFor MenuItem[] @relation("MenuItemAdditionalCategories")
+}
+
+model MenuItem {
+  id                   String      @id @default(cuid())
+  nameEn               String
+  nameAm               String
+  descEn               String?
+  descAm               String?
+  ingredients          String?
+  imageUrl             String?
+  priceETB             Float
+  priceUSD             Float
+  rating               Float       @default(0)
+  ratingCount          Int         @default(0)
+  isAvailable          Boolean     @default(true)
+  tiktokLink           String?
+  instagramLink        String?
+  categoryId           String
+  createdAt            DateTime    @default(now())
+  updatedAt            DateTime    @updatedAt
+  isFeatured           Boolean     @default(false)
+  ingredientsAm        String?
+  dietTypeId           String?
+  category             Category    @relation(fields: [categoryId], references: [id])
+  dietType             DietType?   @relation(fields: [dietTypeId], references: [id], onUpdate: NoAction)
+  orderItems           OrderItem[]
+  reviews              Review[]
+  additionalCategories Category[]  @relation("MenuItemAdditionalCategories")
+
+  @@index([categoryId])
+  @@index([isAvailable])
+}
+
+model Order {
+  id            String         @id @default(cuid())
+  type          OrderType
+  status        OrderStatus    @default(RECEIVED)
+  floorId       String?
+  tableId       String?
+  packaging     String?
+  address       String?
+  customerName  String?
+  phone         String?
+  paymentMethod PaymentMethod?
+  paymentStatus PaymentStatus  @default(PENDING)
+  totalETB      Float
+  totalUSD      Float
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  floor         Floor?         @relation(fields: [floorId], references: [id])
+  table         Table?         @relation(fields: [tableId], references: [id])
+  items         OrderItem[]
+
+  @@index([status])
+  @@index([type])
+  @@index([floorId, tableId])
+}
+
+model OrderItem {
+  id              String   @id @default(cuid())
+  orderId         String
+  menuItemId      String
+  quantity        Int
+  nameEnAtOrder   String
+  nameAmAtOrder   String
+  priceETBAtOrder Float
+  priceUSDAtOrder Float
+  menuItem        MenuItem @relation(fields: [menuItemId], references: [id])
+  order           Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
+}
+
+model Review {
+  id           String    @id @default(cuid())
+  menuItemId   String?
+  rating       Int
+  comment      String?
+  language     String
+  isApproved   Boolean   @default(false)
+  createdAt    DateTime  @default(now())
+  isFeatured   Boolean   @default(false)
+  reviewerName String?
+  wasReviewed  Boolean   @default(false)
+  menuItem     MenuItem? @relation(fields: [menuItemId], references: [id])
+
+  @@index([menuItemId])
+}
+
+model GalleryImage {
+  id         String   @id @default(dbgenerated("(gen_random_uuid())::text"))
+  imageUrl   String
+  caption    String?
+  category   String?
+  isFeatured Boolean  @default(false)
+  order      Int      @default(0)
+  createdAt  DateTime @default(now())
+}
+
+model ContactMessage {
+  id        String   @id @default(dbgenerated("(gen_random_uuid())::text"))
+  name      String
+  email     String
+  message   String
+  createdAt DateTime @default(now())
+  isRead    Boolean  @default(false)
+}
+
+model WaiterRequest {
+  id        String        @id @default(cuid())
+  floorId   String
+  tableId   String
+  type      RequestType
+  status    RequestStatus @default(PENDING)
+  note      String?
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  floor     Floor         @relation(fields: [floorId], references: [id])
+  table     Table         @relation(fields: [tableId], references: [id])
+
+  @@index([status])
+}
+
+model DietType {
+  id        String     @id @default(dbgenerated("(gen_random_uuid())::text"))
+  nameEn    String
+  nameAm    String
+  order     Int        @default(0)
+  menuItems MenuItem[]
+}
+
+model User {
+  id           String   @id @default(cuid())
+  username     String   @unique
+  passwordHash String
+  role         Role
+  createdAt    DateTime @default(now())
+}
+
+enum Role {
+  ADMIN
+  CASHIER
+}
+
+enum OrderType {
+  DINE_IN
+  TAKEAWAY
+  DELIVERY
+}
+
+enum OrderStatus {
+  RECEIVED
+  PREPARING
+  SERVED
+  PAID
+}
+
+enum PaymentMethod {
+  CASH
+  TELEBIRR
+  MOBILE_BANKING
+}
+
+enum PaymentStatus {
+  PENDING
+  SUBMITTED
+  VERIFIED
+}
+
+enum RequestType {
+  BILL
+  WATER
+  BREAD_INJERA
+  ASSISTANCE
+  OTHER
+}
+
+enum RequestStatus {
+  PENDING
+  ACKNOWLEDGED
+  RESOLVED
+}
