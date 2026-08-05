@@ -14,7 +14,9 @@ import {
   Image as ImageIcon,
   Mail,
   Leaf,
+  QrCode,
 } from "lucide-react";
+
 import type { ComponentType } from "react";
 
 type NavItem = {
@@ -87,6 +89,11 @@ const navItems: NavItem[] = [
     label: "Fasting Options",
     icon: Leaf,
   },
+  {
+    href: "/admin/qr-code",
+    label: "Menu QR Code",
+    icon: QrCode,
+  }
 ];
 
 export default function AdminSidebar({
