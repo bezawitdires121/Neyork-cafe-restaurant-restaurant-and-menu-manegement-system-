@@ -8,7 +8,7 @@ export default function ActionForm({
   children,
   className,
 }: {
-  action: (formData: FormData) => Promise<any>;
+action: (formData: FormData) => Promise<any> | void;
   children: React.ReactNode;
   className?: string;
 }) {
